@@ -36,6 +36,7 @@ exports.signIn = async (req, res, next) => {
     console.log("1111");
     const token = jwt.sign({ id: testUser.id }, process.env.secretJwt);
     delete testUser._doc.password;
+    console.log(token)
     res
       .cookie("access_token", token, { httpOnly: true })
       .status(200)
@@ -44,3 +45,26 @@ exports.signIn = async (req, res, next) => {
     next(e);
   }
 };
+exports.google=async (req,res,next)=>{
+  const user =await User.findOne({email:req.body.email})
+ if(user)
+ {
+  const token = jwt.sign({id:user._id},process.env.secretJwt);
+  delete user._doc.password;
+  console.log(token)
+  res.cookie('acces_token',token,{httpOnly:true}).status(200).json(user);
+ }
+ else
+ {
+  const generatedPassword=Math.random().toString(36).slice(-8)+Math.random().toString(36).slice(-8);
+  const hashedPassword=bcrypt.hashSync(generatedPassword,10);
+  const username=req.body.name.split(" ").join("").toLowerCase()+Math.random().toString(36).slice(-3);
+  const user=await User.create({username,password:hashedPassword,email:req.body.email,avatar:req.body.photo});
+  const token =jwt.sign({id:user._id},process.env.secretJwt);
+  delete user._doc.password
+  console.log(token)
+  res.cookie('acces_token',token,{httpOnly:true}).status(200).json(user);
+  
+
+ }
+}

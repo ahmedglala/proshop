@@ -6,6 +6,7 @@ const userSlice = createSlice({
   reducers: {
     signInStart(state) {
       state.loading = true;
+      state.error=false
     },
     signInSuccess(state, action) {
       state.loading = false;
